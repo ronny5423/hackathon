@@ -1,16 +1,13 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from Server import Server
+from Client import Client
+import threading
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+server = Server('127.0.0.1',17200) # update to real ip
+client = Client('local host',14200) # update to real ip
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+client_thread = threading.Thread(target=client.start_client)
+server_thread = threading.Thread(target=server.send_offers_to_clients)
+server_thread.start()
+client_thread.start()
+
