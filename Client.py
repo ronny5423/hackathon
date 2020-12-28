@@ -36,13 +36,12 @@ class Client:
                     self.client_tcp = socket(AF_INET, SOCK_STREAM)
                     self.client_tcp.connect((sender_address[0], port)) # connect to server
                     self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
-                    print("connected to server")
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
                     print("Server disconnected, listening for offer requests")
                 except error:  # if failed to connect to server
-                    print("failed to connect to server " + sender_address[0])
+                    continue
             except struct.error: # if failed to decode data
                 continue
 
@@ -58,7 +57,7 @@ class Client:
                 self.client_tcp.close()
                 return
             decoded_data = data.decode()
-            print("client received from server " + decoded_data)
+            print(decoded_data)
             timer_thread = threading.Thread(target=self.timer) # init 10 second tomer thread
             timer_thread.start()
             while not self.stop_sending_keys:

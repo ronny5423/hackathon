@@ -74,9 +74,7 @@ class Server:
         while not self.kill_listening_thread:
             try:
                 self.tcp_socket.listen()
-                print("listening to requests")
                 client, address = self.tcp_socket.accept()
-                print("client connected")
                 with lock1:
                     connected_clients.append(client)
 
