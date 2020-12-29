@@ -139,8 +139,8 @@ class Server:
             return
 
         participants_in_each_group = int(len(connected_clients) / 2)  # calculate number of participants in each group
-        group1 = connected_clients[:participants_in_each_group + 1]
-        group2 = connected_clients[participants_in_each_group + 1:]
+        group1 = connected_clients[:participants_in_each_group]
+        group2 = connected_clients[participants_in_each_group:]
         group1_input = []
         group2_input = []
         # init welcome message
@@ -193,12 +193,27 @@ class Server:
         else:
             fastest_group = 2
             fastest_group_lst = group2
-        print("Game over!")
-        print("Group" + str(fastest_group) + " was the fastest. Very good Group" + str(fastest_group) + "!")
-        print("Group1 typed " + str(self.group_counters[0]) + " chars, Group2 typed " + str(self.group_counters[1]) + " chars")
-        print("The winners are:")
+        game_over_message = "Game over!\n"
+        game_over_message += "Group" + str(fastest_group) + " was the fastest. Very good Group" + str(fastest_group) + "!\n"
+        game_over_message += "Group1 typed " + str(self.group_counters[0]) + " chars, Group2 typed " + str(self.group_counters[1]) + " chars\n"
+        game_over_message += "The winners are:\n"
         for client in fastest_group_lst:
-            print(group_names[client])
+            game_over_message += (group_names[client] + "\n")
+
+        self.send_game_over_message_to_group_clients(group1,game_over_message)
+        self.send_game_over_message_to_group_clients(group2,game_over_message)
+
+
+    def send_game_over_message_to_group_clients(self,group,message):
+            """
+            This function sends game over message to each client in the group
+            :param group: list,list of client's sockets in group
+            :param message: str,game over message to send
+            :return:
+            """
+            for client in group:
+                if client.fileno() != -1:
+                    client.sendall(message.encode())
 
     def init_dict_input_for_each_group(self, group, group_input_list, welcome_message, group_names):
         """
@@ -253,8 +268,11 @@ class Server:
         :param keys_lst: dict,a dictionary where each client stores the keys he pressed
         :return:
         """
-        client_socket.sendall(welcome_message_to_send.encode())  # send welcome message
-        client_socket.settimeout(1)
+        if client_socket.fileno() != -1: # if connection not closed
+            client_socket.sendall(welcome_message_to_send.encode())  # send welcome message
+        else:
+            return
+        client_socket.settimeout(2)
         while not self.kill_client_game_thread:
             try:
                 data = client_socket.recv(100)  # receive pressed key

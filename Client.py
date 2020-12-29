@@ -3,6 +3,7 @@ import struct
 import time
 import threading
 import msvcrt
+import multiprocessing
 
 
 class Client:
@@ -35,7 +36,8 @@ class Client:
                 try:
                     self.client_tcp = socket(AF_INET, SOCK_STREAM)
                     self.client_tcp.connect((sender_address[0], port)) # connect to server
-                    self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
+                    if self.client_tcp.fileno() != -1: # check if connection not closed
+                        self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
@@ -61,8 +63,22 @@ class Client:
             timer_thread = threading.Thread(target=self.timer) # init 10 second tomer thread
             timer_thread.start()
             while not self.stop_sending_keys:
-                if msvcrt.kbhit():
-                    self.client_tcp.sendall(msvcrt.getch()) # press on keyboard key
+               sending_key_thread = multiprocessing.Process(target=self.sending_key_thread)
+               sending_key_thread.start()
+               sending_key_thread.join(0.5)
+               if sending_key_thread.is_alive():
+                   sending_key_thread.terminate()
+
+            self.client_tcp.settimeout(5)
+            try:
+                game_over_message = self.client_tcp.recv(4096)
+                if not game_over_message:
+                    return
+                decoded_message = game_over_message.decode()
+                print(decoded_message)
+            except:
+                return
+
 
         except error:
             self.client_tcp.close()
@@ -74,5 +90,14 @@ class Client:
         """
         time.sleep(10)
         self.stop_sending_keys = True
+
+    def sending_key_thread(self):
+        """
+        sending key thread function
+        :return:
+        """
+        if self.client_tcp.fileno() != -1:
+            self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
+
 
 
