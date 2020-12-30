@@ -44,10 +44,11 @@ class Client:
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
-                    print("\033[0;31mServer disconnected, listening for offer requests\033[0m")
-                except error:  # if failed to connect to server
+                    print("\033[{}Server disconnected, listening for offer requests\033[0m".format(SERVER_DIS))
+                except:
                     continue
-            except struct.error: # if failed to decode data
+
+            except: # if thrown any error(connection,decode,etc...)
                 continue
 
     def play_game(self):
@@ -82,9 +83,8 @@ class Client:
             except:
                 return
 
-
-        except error:
-            self.client_tcp.close()
+        except:
+            return
 
     def timer(self):
         """
@@ -102,6 +102,3 @@ class Client:
         if self.client_tcp.fileno() != -1:
             self.client_tcp.sendall(getch.getch().encode())
             # self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
-
-
-

@@ -85,7 +85,7 @@ class Server:
                                                          lock1])  # init listening to client's group name thread
                 threads.append(get_name_thread)
                 get_name_thread.start()
-            except socket.timeout:
+            except:
                 continue
 
         for thread in threads:  # wait till all group names were sent
@@ -329,7 +329,5 @@ class Server:
                     keys_lst[decoded_data] = 1
                 with group_counter_lock:
                     self.group_counters[index] += 1
-            except UnicodeError:
-                continue
-            except socket.error:
+            except:
                 continue
