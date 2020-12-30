@@ -16,7 +16,7 @@ class Client:
         self.client_udp = socket(AF_INET, SOCK_DGRAM) # init udp socket
         self.client_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.client_udp.bind(('', 13117))
-        self.name = 'HoneyPot\n' # init name of group
+        self.name = 'Honeypot\n' # init name of group
         self.stop_sending_keys = False
         print("\033[0;95mclient started, listening for offer requests\033[0m")
 
