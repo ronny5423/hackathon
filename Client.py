@@ -2,7 +2,8 @@ from socket import *
 import struct
 import time
 import threading
-import msvcrt
+# import msvcrt
+import getch
 import multiprocessing
 
 
@@ -17,7 +18,7 @@ class Client:
         self.client_udp.bind(('', 13117))
         self.name = 'HoneyPot\n' # init name of group
         self.stop_sending_keys = False
-        print("client started, listening for offer requests")
+        print("\033[0;95mclient started, listening for offer requests\033[0m")
 
     def start_client(self):
         """
@@ -31,7 +32,8 @@ class Client:
                 decoded_message = struct.unpack('Ibh', data) # decode brodcast message in format int,int int
                 if decoded_message[0] != 0xfeedbeef: # if decoded message doesn't start with this
                     continue
-                print("received offer from " + sender_address[0] + ", attempting to connect...")
+                print("\033[0;95mreceived offer from {}, attempting to connect...\033[0m".format(sender_address[0]))
+
                 port = decoded_message[2]
                 try:
                     self.client_tcp = socket(AF_INET, SOCK_STREAM)
@@ -41,7 +43,7 @@ class Client:
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
-                    print("Server disconnected, listening for offer requests")
+                    print("\033[0;31mServer disconnected, listening for offer requests\033[0m")
                 except error:  # if failed to connect to server
                     continue
             except struct.error: # if failed to decode data
@@ -75,7 +77,7 @@ class Client:
                 if not game_over_message:
                     return
                 decoded_message = game_over_message.decode()
-                print(decoded_message)
+                print("\033[1;33m{}\033[0m".format(decoded_message))
             except:
                 return
 
@@ -97,7 +99,8 @@ class Client:
         :return:
         """
         if self.client_tcp.fileno() != -1:
-            self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
+            self.client_tcp.sendall(getch.getch().encode())
+            # self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
 
 
 

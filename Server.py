@@ -3,7 +3,6 @@ import threading
 import time
 import struct
 
-
 class Server:
     def __init__(self, ip, port):
         """
@@ -29,7 +28,7 @@ class Server:
         self.tcp_socket.bind((self.ip, self.port))
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        print('Server started, listening on IP address ' + str(self.ip))
+        print("\033[0;94mServer started, listening on IP address {}\033[0m".format(self.ip))
 
         while True:
             connected_clients = []
@@ -55,8 +54,8 @@ class Server:
         :return:
         """
         while counter > 0:
-            self.udp_socket.sendto(message, ('255.255.255.255', 13117))
-            print("sending brodcast message")
+            self.udp_socket.sendto(message, ('127.0.0.1', 13117))
+            print("\033[0;36msending broadcast message \033[0m")
             time.sleep(1)
             counter -= 1
 
@@ -144,13 +143,13 @@ class Server:
         group1_input = []
         group2_input = []
         # init welcome message
-        welcome_message_to_clients = 'Welcome to destroying keyboard game:)\nGroup 1:\n==\n'
+        welcome_message_to_clients = '\033[1;94mWelcome to destroying keyboard game:)\nGroup 1:\n==\n\033[0m'
         welcome_message_to_clients = self.init_dict_input_for_each_group(group1, group1_input,
                                                                          welcome_message_to_clients, group_names)
-        welcome_message_to_clients += 'Group 2:\n==\n'
+        welcome_message_to_clients += '\033[1;94mGroup 2:\n==\n\033[0m'
         welcome_message_to_clients = self.init_dict_input_for_each_group(group2, group2_input,
                                                                          welcome_message_to_clients, group_names)
-        welcome_message_to_clients += 'start pressing keys on keyboard as fast as you can for 10 seconds\n'
+        welcome_message_to_clients += '\033[1;94mstart pressing keys on keyboard as fast as you can for 10 seconds\033[0m\n'
         threads = []
         group1_counter_lock = threading.Lock()
         group2_counter_lock = threading.Lock()
@@ -170,7 +169,7 @@ class Server:
         for client in connected_clients:
             client.close()
         self.group_counters = [0,0]
-        print("Game over, sending out offer requests...")
+        print("\033[0;36mGame over, sending out offer requests...\033[0m")
 
     def print_relevant_end_game_data(self, group1_input, group2_input, group_names, group1, group2):
         """
@@ -193,12 +192,12 @@ class Server:
         else:
             fastest_group = 2
             fastest_group_lst = group2
-        game_over_message = "Game over!\n"
-        game_over_message += "Group" + str(fastest_group) + " was the fastest. Very good Group" + str(fastest_group) + "!\n"
-        game_over_message += "Group1 typed " + str(self.group_counters[0]) + " chars, Group2 typed " + str(self.group_counters[1]) + " chars\n"
-        game_over_message += "The winners are:\n"
+        game_over_message = "\033[1;94mGame over!\n\033[0m"
+        game_over_message += "\033[1;94mGroup {0} was the fastest. Very good Group{1}!\n\033[0m".format(str(fastest_group), str(fastest_group))
+        game_over_message += "\033[1;94mGroup1 typed {0} chars, Group2 typed {1} chars\n\033[0m".format(str(self.group_counters[0]), str(self.group_counters[1]))
+        game_over_message += "\033[1;32mThe winners are:\n\033[0m"
         for client in fastest_group_lst:
-            game_over_message += (group_names[client] + "\n")
+            game_over_message += ("\033[1;32m{}\n\033[0m".format(group_names[client]))
 
         self.send_game_over_message_to_group_clients(group1,game_over_message)
         self.send_game_over_message_to_group_clients(group2,game_over_message)
@@ -226,8 +225,7 @@ class Server:
         """
         for client in group:
             group_input_list.append({})
-            welcome_message += group_names[client]
-            welcome_message += '\n'
+            welcome_message += "\033[92m{}\n".format(group_names[client])
         return welcome_message
 
     def init_threads_for_client_game_communication(self, threads_list, welcome_message, group, group_input_dicts,group_counter_lock,counter_index):

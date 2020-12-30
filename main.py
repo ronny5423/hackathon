@@ -8,11 +8,11 @@ server = Server('127.0.0.1',2130)
 client = Client()
 server_thread = threading.Thread(target=server.start_server)
 client_threads = []
-for i in range(3):
-    client_threads.append(threading.Thread(target=client.start_client))
-#client_thread = threading.Thread(target=client.start_client)
+# for i in range(3):
+#     client_threads.append(threading.Thread(target=client.start_client))
+client_thread = threading.Thread(target=client.start_client)
 server_thread.start()
-for thread in client_threads:
-    thread.start()
-#client_thread.start()
+# for thread in client_threads:
+#     thread.start()
+client_thread.start()
 
