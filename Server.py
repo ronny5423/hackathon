@@ -57,7 +57,7 @@ class Server:
         :return:
         """
         while counter > 0:
-            self.udp_socket.sendto(message, ('127.0.0.1', 13117))
+            self.udp_socket.sendto(message, ('255.255.255.255', 13117))
             print("\033[{}sending broadcast message \033[0m".format(BROADCAST))
             time.sleep(1)
             counter -= 1

@@ -3,8 +3,8 @@ from Client import Client
 import threading
 from scapy.all import get_if_addr
 
-ip = get_if_addr('eth1')
-server = Server(ip,2130)
+ip = get_if_addr('eth2')
+server = Server(ip,2031)
 client = Client()
 server_thread = threading.Thread(target=server.start_server)
 client_thread = threading.Thread(target=client.start_client)
