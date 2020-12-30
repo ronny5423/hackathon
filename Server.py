@@ -191,7 +191,7 @@ class Server:
                 self.best_counter = self.group_counters[0]
                 self.best_group_names = ""
                 for client in fastest_group_lst:
-                    self.best_group_names += ("{}".format(group_names[client]))
+                    self.best_group_names += ("{}, ".format(group_names[client]))
         else:
             fastest_group = 2
             fastest_group_lst = group2
@@ -199,12 +199,13 @@ class Server:
                 self.best_counter = self.group_counters[1]
                 self.best_group_names = ""
                 for client in fastest_group_lst:
-                    self.best_group_names += ("{} ".format(group_names[client]))
-
+                    self.best_group_names += ("{}, ".format(group_names[client]))
 
         game_over_message = "\033[1;94mGame over!\n\033[0m"
-        game_over_message += "\033[1;94mGroup {0} was the fastest. Very good Group{1}!\n\033[0m".format(str(fastest_group), str(fastest_group))
-        game_over_message += "\033[1;94mGroup1 typed {0} chars, Group2 typed {1} chars\n\033[0m".format(str(self.group_counters[0]), str(self.group_counters[1]))
+        game_over_message += "\033[1;94mGroup {0} was the fastest. Very good Group{1}!" \
+                             "\n\033[0m".format(str(fastest_group), str(fastest_group))
+        game_over_message += "\033[1;94mGroup1 typed {0} chars, Group2 typed {1} characters" \
+                             "\n\033[0m".format(str(self.group_counters[0]), str(self.group_counters[1]))
         game_over_message += "\033[1;32mThe winners are:\n\033[0m"
         for client in fastest_group_lst:
             game_over_message += ("\033[1;32m{}\n\033[0m".format(group_names[client]))
@@ -228,7 +229,7 @@ class Server:
                                  "\n\033[0m".format(self.group_counters[1]/10)
 
         game_over_message += "\033[1;94mThe best team of all times were: {0}" \
-                             " with {1} typed characters!\n\033[0m".format(self.best_group_names, self.best_counter)
+                             " with {1} typed characters!\n\033[0m".format(self.best_group_names[:-2], self.best_counter)
 
         self.send_game_over_message_to_group_clients(group1,game_over_message)
         self.send_game_over_message_to_group_clients(group2,game_over_message)
