@@ -2,7 +2,7 @@ from socket import *
 import struct
 import time
 import threading
-# import msvcrt
+#import msvcrt
 import getch
 import multiprocessing
 from constants import *
@@ -30,7 +30,7 @@ class Client:
             try:
                 data, sender_address = self.client_udp.recvfrom(8) # receive brodcast message from server
                 decoded_message = struct.unpack('IbH', data) # decode brodcast message in format int,int int
-                if decoded_message[0] != 0xfeedbeef: # if decoded message doesn't start with this
+                if decoded_message[0] != 0xfeedbeef or decoded_message[1] != 0x2: # if decoded message doesn't start with this
                     continue
                 print("\033[{0}received offer from {1},"
                       " attempting to connect...\033[0m".format(CLIENT_COLOR, sender_address[0]))
@@ -101,4 +101,4 @@ class Client:
         """
         if self.client_tcp.fileno() != -1:
             self.client_tcp.sendall(getch.getch().encode())
-            # self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
+            #self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
