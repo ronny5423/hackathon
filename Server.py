@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import struct
+from constants import *
 
 class Server:
     def __init__(self, ip, port):
@@ -30,7 +31,7 @@ class Server:
         self.tcp_socket.bind((self.ip, self.port))
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        print("\033[0;94mServer started, listening on IP address {}\033[0m".format(self.ip))
+        print("\033[{0}Server started, listening on IP address {1}\033[0m".format(SERVER_COLOR, self.ip))
 
         while True:
             connected_clients = []
@@ -57,7 +58,7 @@ class Server:
         """
         while counter > 0:
             self.udp_socket.sendto(message, ('127.0.0.1', 13117))
-            print("\033[0;36msending broadcast message \033[0m")
+            print("\033[{}sending broadcast message \033[0m".format(BROADCAST))
             time.sleep(1)
             counter -= 1
 
@@ -145,13 +146,14 @@ class Server:
         group1_input = []
         group2_input = []
         # init welcome message
-        welcome_message_to_clients = '\033[1;94mWelcome to destroying keyboard game:)\nGroup 1:\n==\n\033[0m'
+        welcome_message_to_clients = '\033[{}Welcome to destroying keyboard game:)\nGroup 1:\n==\n\033[0m'.format(GAME)
         welcome_message_to_clients = self.init_dict_input_for_each_group(group1, group1_input,
                                                                          welcome_message_to_clients, group_names)
-        welcome_message_to_clients += '\033[1;94mGroup 2:\n==\n\033[0m'
+        welcome_message_to_clients += '\033[{}Group 2:\n==\n\033[0m'.format(GAME)
         welcome_message_to_clients = self.init_dict_input_for_each_group(group2, group2_input,
                                                                          welcome_message_to_clients, group_names)
-        welcome_message_to_clients += '\033[1;94mstart pressing keys on keyboard as fast as you can for 10 seconds\033[0m\n'
+        welcome_message_to_clients += '\033[{}start pressing keys on keyboard as fast as you can' \
+                                      ' for 10 seconds\033[0m\n'.format(SERVER_COLOR)
         threads = []
         group1_counter_lock = threading.Lock()
         group2_counter_lock = threading.Lock()
@@ -171,7 +173,7 @@ class Server:
         for client in connected_clients:
             client.close()
         self.group_counters = [0,0]
-        print("\033[0;36mGame over, sending out offer requests...\033[0m")
+        print("\033[{}Game over, sending out offer requests...\033[0m".format(GAME))
 
     def print_relevant_end_game_data(self, group1_input, group2_input, group_names, group1, group2):
         """
@@ -201,35 +203,35 @@ class Server:
                 for client in fastest_group_lst:
                     self.best_group_names += ("{}, ".format(group_names[client]))
 
-        game_over_message = "\033[1;94mGame over!\n\033[0m"
-        game_over_message += "\033[1;94mGroup {0} was the fastest. Very good Group{1}!" \
-                             "\n\033[0m".format(str(fastest_group), str(fastest_group))
-        game_over_message += "\033[1;94mGroup1 typed {0} chars, Group2 typed {1} characters" \
-                             "\n\033[0m".format(str(self.group_counters[0]), str(self.group_counters[1]))
-        game_over_message += "\033[1;32mThe winners are:\n\033[0m"
+        game_over_message = "\033[{}Game over!\n\033[0m".format(GAME)
+        game_over_message += "\033[{0}Group {1} was the fastest. Very good Group{2}!" \
+                             "\n\033[0m".format(GAME, str(fastest_group), str(fastest_group))
+        game_over_message += "\033[{0}Group1 typed {1} characters, Group2 typed {2} characters" \
+                             "\n\033[0m".format(GAME, str(self.group_counters[0]), str(self.group_counters[1]))
+        game_over_message += "\033[{}The winners are:\n\033[0m".format(WINNERS)
         for client in fastest_group_lst:
-            game_over_message += ("\033[1;32m{}\n\033[0m".format(group_names[client]))
+            game_over_message += ("\033[{0}{1}\n\033[0m".format(WINNERS, group_names[client]))
 
         # more game statistic bonuses
         common_char1 = self.compute_statitsics_for_group(group1_input)
         common_char2 = self.compute_statitsics_for_group(group2_input)
 
-        game_over_message += "\033[1;94m\nFun Facts:\n\033[0m"
+        game_over_message += "\033[{}\nFun Facts:\n\033[0m".format(FACTS)
         if common_char1:
-            game_over_message += "\033[1;95mIn this game the most commonly typed character of Group 1 was:" \
-                                 " {}\n\033[0m".format(common_char1)
+            game_over_message += "\033[{0}In this game the most commonly typed character of Group 1 was:" \
+                                 " {1}\n\033[0m".format(FACTS, common_char1)
         if common_char2:
-            game_over_message += "\033[1;94mIn this game the most commonly typed character of Group 2 was:" \
-                                 " {}\n\033[0m".format(common_char2)
+            game_over_message += "\033[{0}In this game the most commonly typed character of Group 2 was:" \
+                                 " {1}\n\033[0m".format(FACTS, common_char2)
         if fastest_group == 1:
-            game_over_message += "\033[1;95mIn this game the average was {} characters per second!" \
-                                 "\n\033[0m".format(self.group_counters[0]/10)
+            game_over_message += "\033[{0}In this game the average was {1} characters per second!" \
+                                 "\n\033[0m".format(FACTS, self.group_counters[0]/10)
         else:
-            game_over_message += "\033[1;95mIn this game the average was {} characters per second!" \
-                                 "\n\033[0m".format(self.group_counters[1]/10)
+            game_over_message += "\033[{0}In this game the average was {1} characters per second!" \
+                                 "\n\033[0m".format(FACTS, self.group_counters[1]/10)
 
-        game_over_message += "\033[1;94mThe best team of all times were: {0}" \
-                             " with {1} typed characters!\n\033[0m".format(self.best_group_names[:-2], self.best_counter)
+        game_over_message += "\033[{0}The best team of all times were: {1}" \
+                             " with {2} typed characters!\n\033[0m".format(FACTS, self.best_group_names[:-2], self.best_counter)
 
         self.send_game_over_message_to_group_clients(group1,game_over_message)
         self.send_game_over_message_to_group_clients(group2,game_over_message)
@@ -257,7 +259,7 @@ class Server:
         """
         for client in group:
             group_input_list.append({})
-            welcome_message += "\033[92m{}\n".format(group_names[client])
+            welcome_message += "\033[{0}{1}\n".format(GROUPS, group_names[client])
         return welcome_message
 
     def init_threads_for_client_game_communication(self, threads_list, welcome_message, group, group_input_dicts,group_counter_lock,counter_index):

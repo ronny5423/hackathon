@@ -5,7 +5,7 @@ import threading
 # import msvcrt
 import getch
 import multiprocessing
-
+from constants import *
 
 class Client:
 
@@ -18,7 +18,7 @@ class Client:
         self.client_udp.bind(('', 13117))
         self.name = 'Honeypot\n' # init name of group
         self.stop_sending_keys = False
-        print("\033[0;95mclient started, listening for offer requests\033[0m")
+        print("\033[{}client started, listening for offer requests\033[0m".format(CLIENT_COLOR))
 
     def start_client(self):
         """
@@ -32,7 +32,8 @@ class Client:
                 decoded_message = struct.unpack('Ibh', data) # decode brodcast message in format int,int int
                 if decoded_message[0] != 0xfeedbeef: # if decoded message doesn't start with this
                     continue
-                print("\033[0;95mreceived offer from {}, attempting to connect...\033[0m".format(sender_address[0]))
+                print("\033[{0}received offer from {1},"
+                      " attempting to connect...\033[0m".format(CLIENT_COLOR, sender_address[0]))
 
                 port = decoded_message[2]
                 try:
@@ -77,7 +78,7 @@ class Client:
                 if not game_over_message:
                     return
                 decoded_message = game_over_message.decode()
-                print("\033[1;33m{}\033[0m".format(decoded_message))
+                print("\033[{0}{1}\033[0m".format(SERVER_COLOR, decoded_message))
             except:
                 return
 
