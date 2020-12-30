@@ -29,7 +29,7 @@ class Client:
         while True:
             try:
                 data, sender_address = self.client_udp.recvfrom(8) # receive brodcast message from server
-                decoded_message = struct.unpack('Ibh', data) # decode brodcast message in format int,int int
+                decoded_message = struct.unpack('IbH', data) # decode brodcast message in format int,int int
                 if decoded_message[0] != 0xfeedbeef: # if decoded message doesn't start with this
                     continue
                 print("\033[{0}received offer from {1},"
