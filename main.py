@@ -1,9 +1,17 @@
 from Server import Server
 from Client import Client
 import threading
+import sys
 from scapy.all import get_if_addr
 
-#ip = get_if_addr('uth1')
+# choose network
+# args_lst = sys.argv
+# network = args_lst[1]
+# if not network:
+#     ip = get_if_addr('uth1')
+# else:
+#     ip = get_if_addr(network)
+
 server = Server('127.0.0.1',2130)
 server_thread = threading.Thread(target=server.start_server)
 client_threads = []
