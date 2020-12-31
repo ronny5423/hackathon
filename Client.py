@@ -42,6 +42,7 @@ class Client:
                     try:
                         self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
                     except:
+                        self.client_tcp.close()
                         continue
                     self.play_game() # play game
                     self.stop_sending_keys = False

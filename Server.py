@@ -126,7 +126,7 @@ class Server:
             with lock:  # add name to names dict
                 names_dic[client_socket] = name
 
-        except socket.timeout:
+        except:
             client_socket.close()
             with lock1:
                 connected_clients.remove(client_socket)  # remove disconnected client from connected clients list
@@ -334,7 +334,6 @@ class Server:
             try:
                 data = client_socket.recv(100)  # receive pressed key
                 if not data:  # if connection is close
-                    client_socket.close()
                     return
                 decoded_data = data.decode()  # decode key
                 if len(decoded_data) != 1:  # if the key is longer than a single char
