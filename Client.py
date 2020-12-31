@@ -39,8 +39,10 @@ class Client:
                 try:
                     self.client_tcp = socket(AF_INET, SOCK_STREAM)
                     self.client_tcp.connect((sender_address[0], port)) # connect to server
-                    if self.client_tcp.fileno() != -1: # check if connection not closed
+                    try:
                         self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
+                    except:
+                        continue
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
@@ -100,6 +102,8 @@ class Client:
         sending key thread function
         :return:
         """
-        if self.client_tcp.fileno() != -1:
+        try:
             self.client_tcp.sendall(getch.getch().encode())
             #self.client_tcp.sendall(msvcrt.getch())  # press on keyboard key
+        except:
+            pass

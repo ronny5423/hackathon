@@ -258,8 +258,10 @@ class Server:
             :return:
             """
             for client in group:
-                if client.fileno() != -1:
+                try:
                     client.sendall(message.encode())
+                except:
+                    pass
 
     def init_dict_input_for_each_group(self, group, group_input_list, welcome_message, group_names):
         """
@@ -322,10 +324,11 @@ class Server:
         :param keys_lst: dict,a dictionary where each client stores the keys he pressed
         :return:
         """
-        if client_socket.fileno() != -1: # if connection not closed
+        try:
             client_socket.sendall(welcome_message_to_send.encode())  # send welcome message
-        else:
+        except:
             return
+
         client_socket.settimeout(2)
         while not self.kill_client_game_thread:
             try:
