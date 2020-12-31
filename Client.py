@@ -15,7 +15,7 @@ class Client:
         """
         self.client_udp = socket(AF_INET, SOCK_DGRAM) # init udp socket
         self.client_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.client_udp.bind(('', 13117))
+        self.client_udp.bind(('', UDP_DEST_PORT))
         self.name = 'Honeypot\n' # init name of group
         self.stop_sending_keys = False
         print("\033[{}client started, listening for offer requests\033[0m".format(CLIENT_COLOR))
@@ -30,7 +30,7 @@ class Client:
             try:
                 data, sender_address = self.client_udp.recvfrom(8) # receive brodcast message from server
                 decoded_message = struct.unpack('IbH', data) # decode brodcast message in format int,int int
-                if decoded_message[0] != 0xfeedbeef or decoded_message[1] != 0x2: # if decoded message doesn't start with this
+                if decoded_message[0] != COOKIE or decoded_message[1] != MESSAGE_TYPE: # if decoded message doesn't start with this
                     continue
                 print("\033[{0}received offer from {1},"
                       " attempting to connect...\033[0m".format(CLIENT_COLOR, sender_address[0]))
@@ -57,8 +57,9 @@ class Client:
         :return:
         """
         self.client_tcp.settimeout(22)
+        buffer = 4096
         try:
-            data = self.client_tcp.recv(4096) # wait to receive welcome message
+            data = self.client_tcp.recv(buffer) # wait to receive welcome message
             if not data:  # if connection closed
                 self.client_tcp.close()
                 return
@@ -75,7 +76,7 @@ class Client:
 
             self.client_tcp.settimeout(5)
             try:
-                game_over_message = self.client_tcp.recv(4096)
+                game_over_message = self.client_tcp.recv(buffer)
                 if not game_over_message:
                     return
                 decoded_message = game_over_message.decode()

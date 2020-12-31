@@ -27,7 +27,7 @@ class Server:
         :return:
         """
         # init all server sockets
-        self.udp_socket.bind((self.ip, 15200))
+        self.udp_socket.bind((self.ip, UDP_SRC_PORT))
         self.tcp_socket.bind((self.ip, self.port))
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -39,7 +39,7 @@ class Server:
             self.kill_listening_thread = False
             self.kill_client_game_thread = False
             brodcast_message_thread = threading.Thread(target=self.send_brodcast_message, args=[
-                struct.pack('IbH', 0xfeedbeef, 0x2, self.port)])  # init sending brodcast messages thread
+                struct.pack('IbH',  COOKIE, MESSAGE_TYPE, self.port)])  # init sending brodcast messages thread
             listen_to_clients_thread = threading.Thread(target=self.listen_to_clients, args=[connected_clients,
                                                                                              group_names])  # init listening to clients thread
             brodcast_message_thread.start()
@@ -57,7 +57,7 @@ class Server:
         :return:
         """
         while counter > 0:
-            self.udp_socket.sendto(message, ('255.255.255.255', 13117))
+            self.udp_socket.sendto(message, (UDP_IP, UDP_DEST_PORT))
             print("\033[{}sending broadcast message \033[0m".format(BROADCAST))
             time.sleep(1)
             counter -= 1
@@ -103,9 +103,10 @@ class Server:
         """
         client_socket.settimeout(3)
         name = ''
+        buffer = 1024
         try:
             while True:
-                data = client_socket.recv(1024)  # receive data from client
+                data = client_socket.recv(buffer)  # receive data from client
                 if not data:  # if client is not connected
                     client_socket.close()
                     with lock1:  # remove disconnected client from connected clients list
