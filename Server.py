@@ -187,14 +187,18 @@ class Server:
         :return:
         """
 
+        fastest_group = 1
+        fastest_group_lst = group1
+        tie = False
+
         if self.group_counters[0] > self.group_counters[1]:
-            fastest_group = 1
-            fastest_group_lst = group1
             if self.best_counter < self.group_counters[0]:
                 self.best_counter = self.group_counters[0]
                 self.best_group_names = ""
                 for client in fastest_group_lst:
                     self.best_group_names += ("{}, ".format(group_names[client]))
+        elif self.group_counters[0] == self.group_counters[1]:
+            tie = True
         else:
             fastest_group = 2
             fastest_group_lst = group2
@@ -205,13 +209,17 @@ class Server:
                     self.best_group_names += ("{}, ".format(group_names[client]))
 
         game_over_message = "\033[{}Game over!\n\033[0m".format(GAME)
-        game_over_message += "\033[{0}Group {1} was the fastest. Very good Group{2}!" \
-                             "\n\033[0m".format(GAME, str(fastest_group), str(fastest_group))
-        game_over_message += "\033[{0}Group1 typed {1} characters, Group2 typed {2} characters" \
-                             "\n\033[0m".format(GAME, str(self.group_counters[0]), str(self.group_counters[1]))
-        game_over_message += "\033[{}The winners are:\n\033[0m".format(WINNERS)
-        for client in fastest_group_lst:
-            game_over_message += ("\033[{0}{1}\n\033[0m".format(WINNERS, group_names[client]))
+        if tie:
+            game_over_message += "\033[{0}It's a Tie! Very good all!" \
+                                 "\n\033[0m".format(GAME)
+        else:
+            game_over_message += "\033[{0}Group {1} was the fastest. Very good Group {2}!" \
+                                 "\n\033[0m".format(GAME, str(fastest_group), str(fastest_group))
+            game_over_message += "\033[{0}Group 1 typed {1} characters, Group 2 typed {2} characters" \
+                                 "\n\033[0m".format(GAME, str(self.group_counters[0]), str(self.group_counters[1]))
+            game_over_message += "\033[{}The winners are:\n\033[0m".format(WINNERS)
+            for client in fastest_group_lst:
+                game_over_message += ("\033[{0}{1}\n\033[0m".format(WINNERS, group_names[client]))
 
         # more game statistic bonuses
         common_char1 = self.compute_statitsics_for_group(group1_input)
@@ -224,15 +232,19 @@ class Server:
         if common_char2:
             game_over_message += "\033[{0}In this game the most commonly typed character of Group 2 was:" \
                                  " {1}\n\033[0m".format(FACTS, common_char2)
-        if fastest_group == 1:
+        if fastest_group == 1 and self.group_counters[0] > 0:
             game_over_message += "\033[{0}In this game the average was {1} characters per second!" \
                                  "\n\033[0m".format(FACTS, self.group_counters[0]/10)
-        else:
+        elif fastest_group == 2 and self.group_counters[1] > 0:
             game_over_message += "\033[{0}In this game the average was {1} characters per second!" \
                                  "\n\033[0m".format(FACTS, self.group_counters[1]/10)
 
-        game_over_message += "\033[{0}The best team of all times were: {1}" \
-                             " with {2} typed characters!\n\033[0m".format(FACTS, self.best_group_names[:-2], self.best_counter)
+        if self.best_counter > 0:
+            game_over_message += "\033[{0}The best team of all times were: {1} with {2} typed characters!" \
+                                 "\n\033[0m".format(FACTS, self.best_group_names[:-2], self.best_counter)
+        else:
+            game_over_message += "\033[{0}You are the First to play on this Server!" \
+                                 "\n\033[0m".format(FACTS)
 
         self.send_game_over_message_to_group_clients(group1,game_over_message)
         self.send_game_over_message_to_group_clients(group2,game_over_message)
