@@ -13,9 +13,12 @@ class Client:
         """
         Constructor
         """
+        self.client_udp = socket(AF_INET, SOCK_DGRAM)  # init udp socket
+        self.client_udp.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.client_udp.bind(('', UDP_DEST_PORT))
         self.name = 'Honeypot\n' # init name of group
         self.stop_sending_keys = False
-
+        print("\033[{}client started, listening for offer requests\033[0m".format(CLIENT_COLOR))
 
     def start_client(self):
         """
@@ -25,9 +28,7 @@ class Client:
         """
         while True:
             try:
-                self.client_udp = socket(AF_INET, SOCK_DGRAM)  # init udp socket
-                self.client_udp.bind(('', UDP_DEST_PORT))
-                print("\033[{}client started, listening for offer requests\033[0m".format(CLIENT_COLOR))
+
                 data, sender_address = self.client_udp.recvfrom(8) # receive brodcast message from server
                 decoded_message = struct.unpack('IbH', data) # decode brodcast message in format int,int int
                 if decoded_message[0] != COOKIE or decoded_message[1] != MESSAGE_TYPE: # if decoded message doesn't start with this
@@ -43,21 +44,17 @@ class Client:
                         self.client_tcp.sendall(self.name.encode()) # send the server the name of the group
                     except:
                         self.client_tcp.close()
-                        self.client_udp.close()
                         continue
                     self.play_game() # play game
                     self.stop_sending_keys = False
                     self.client_tcp.close() # close connection with server
                     print("\033[{}Server disconnected, listening for offer requests\033[0m".format(SERVER_DIS))
                 except:
-                    self.client_udp.close()
                     continue
 
             except: # if thrown any error(connection,decode,etc...)
-                self.client_udp.close()
                 continue
 
-            self.client_udp.close()
 
     def play_game(self):
         """
